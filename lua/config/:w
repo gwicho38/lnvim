@@ -181,7 +181,7 @@ end, { desc = "Git Browse (copy)" })
 -- gitsigns
 
 if vim.fn.executable("gitsigns") == 1 then
-  map({ "<leader>gA", function() Snacks.picker.git_stash() end, desc = "Git Add" })
+  { "<leader>gA", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
 end
 
 -- quit
