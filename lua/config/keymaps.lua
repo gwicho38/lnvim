@@ -174,7 +174,13 @@ end
 map("n", "<leader>gb", function() Snacks.picker.git_log_line() end, { desc = "Git Blame Line" })
 map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse (open)" })
 map({"n", "x" }, "<leader>gY", function()
-  Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
+  Snacks.gitbrowse({ 
+    open = function(url) 
+      vim.fn.setreg("+", url)
+      vim.notify("Copied URL to clipboard: " .. url, vim.log.levels.INFO)
+    end, 
+    notify = false 
+  })
 end, { desc = "Git Browse (copy)" })
 
 

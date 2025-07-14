@@ -10,8 +10,12 @@ return {
     Reloader = opts.tweaks.default
     Reloader = "💤"
 
-    Pattern = opts.tweaks.patterns
-    Pattern = { "main.py", "main.go" }
+    -- Set file patterns with fallback to index.*
+    local function get_patterns()
+      local user_patterns = opts.tweaks.patterns or {}
+      return #user_patterns > 0 and user_patterns or { "main.py", "main.go", "index.*" }
+    end
+    Pattern = get_patterns()
 
     opts.tweaks.start = "🚀"
     opts.tweaks.stop = "💤"

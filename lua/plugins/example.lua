@@ -9,15 +9,28 @@ if true then return {} end
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 return {
-  -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
-
-  -- Configure LazyVim to load gruvbox
+  -- Configure gruvbox with enhanced settings
   {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "gruvbox",
-    },
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
+    config = function()
+      require("gruvbox").setup({
+        undercurl = true,
+        underline = true,
+        bold = true,
+        italic = {
+          strings = true,
+          comments = true,
+          operators = false,
+          folds = true,
+        },
+        contrast = "hard", -- can be "hard", "soft" or empty string
+        palette_overrides = {
+          dark0_hard = "#1d2021",
+        },
+      })
+      vim.cmd.colorscheme("gruvbox")
+    end
   },
 
   -- change trouble config
