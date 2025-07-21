@@ -3,9 +3,8 @@
 -- Add any additional keymaps here
 -- This file is automatically loaded by lazyvim.config.init
 
--- DO NOT USE `LazyVim.safe_keymap_set` IN YOUR OWN CONFIG!!
--- use `vim.keymap.set` instead
-local map = LazyVim.safe_keymap_set
+-- Use vim.keymap.set instead of LazyVim.safe_keymap_set for custom configs
+local map = vim.keymap.set
 
 -- better up/down
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
@@ -41,17 +40,28 @@ map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 map("n", "<leader>bd", function()
-  Snacks.bufdelete()
+  if LazyVim and LazyVim.ui and LazyVim.ui.bufremove then
+    LazyVim.ui.bufremove()
+  else
+    vim.cmd("bdelete")
+  end
 end, { desc = "Delete Buffer" })
 map("n", "<leader>bo", function()
-  Snacks.bufdelete.other()
+  local current = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if buf ~= current and vim.api.nvim_buf_is_loaded(buf) then
+      vim.api.nvim_buf_delete(buf, { force = false })
+    end
+  end
 end, { desc = "Delete Other Buffers" })
 map("n", "<leader>bD", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
 
 -- Clear search and stop snippet on escape
 map({ "i", "n", "s" }, "<esc>", function()
   vim.cmd("noh")
-  LazyVim.cmp.actions.snippet_stop()
+  if LazyVim and LazyVim.cmp and LazyVim.cmp.actions then
+    LazyVim.cmp.actions.snippet_stop()
+  end
   return "<esc>"
 end, { expr = true, desc = "Escape and Clear hlsearch" })
 
@@ -97,28 +107,19 @@ map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 -- new file
 map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
 
--- location list
-map("n", "<leader>xl", function()
-  local success, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
-  if not success and err then
-    vim.notify(err, vim.log.levels.ERROR)
-  end
-end, { desc = "Location List" })
-
--- quickfix list
-map("n", "<leader>xq", function()
-  local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
-  if not success and err then
-    vim.notify(err, vim.log.levels.ERROR)
-  end
-end, { desc = "Quickfix List" })
+map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
+map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
 map("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
 map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
 
 -- formatting
 map({ "n", "v" }, "<leader>cf", function()
-  LazyVim.format({ force = true })
+  if LazyVim and LazyVim.format then
+    LazyVim.format({ force = true })
+  else
+    vim.lsp.buf.format()
+  end
 end, { desc = "Format" })
 
 -- diagnostic
@@ -140,48 +141,47 @@ map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 -- stylua: ignore start
 
 -- toggle options
-LazyVim.format.snacks_toggle():map("<leader>uf")
-LazyVim.format.snacks_toggle(true):map("<leader>uF")
-Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
-Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
-Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
-Snacks.toggle.diagnostics():map("<leader>ud")
-Snacks.toggle.line_number():map("<leader>ul")
-Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
-Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
-Snacks.toggle.treesitter():map("<leader>uT")
-Snacks.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" }):map("<leader>ub")
-Snacks.toggle.dim():map("<leader>uD")
-Snacks.toggle.animate():map("<leader>ua")
-Snacks.toggle.indent():map("<leader>ug")
-Snacks.toggle.scroll():map("<leader>uS")
-Snacks.toggle.profiler():map("<leader>dpp")
-Snacks.toggle.profiler_highlights():map("<leader>dph")
+if LazyVim and LazyVim.toggle then
+  LazyVim.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+  LazyVim.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+  LazyVim.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+  LazyVim.toggle.diagnostics():map("<leader>ud")
+  LazyVim.toggle.line_number():map("<leader>ul")
+  LazyVim.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
+  LazyVim.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
+  LazyVim.toggle.treesitter():map("<leader>uT")
+  LazyVim.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" }):map("<leader>ub")
+  LazyVim.toggle.dim():map("<leader>uD")
+  LazyVim.toggle.animate():map("<leader>ua")
+  LazyVim.toggle.indent():map("<leader>ug")
+  LazyVim.toggle.scroll():map("<leader>uS")
+  LazyVim.toggle.profiler():map("<leader>dpp")
+  LazyVim.toggle.profiler_highlights():map("<leader>dph")
 
-if vim.lsp.inlay_hint then
-  Snacks.toggle.inlay_hints():map("<leader>uh")
+  if vim.lsp.inlay_hint then
+    LazyVim.toggle.inlay_hints():map("<leader>uh")
+  end
+
+  -- lazygit
+  if LazyVim.has("lazygit.nvim") then
+    map("n", "<leader>gg", function() LazyVim.lazygit( { cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
+    map("n", "<leader>gG", function() LazyVim.lazygit() end, { desc = "Lazygit (cwd)" })
+    map("n", "<leader>gf", function() LazyVim.lazygit.log_file() end, { desc = "Git Current File History" })
+    map("n", "<leader>gl", function() LazyVim.lazygit.log({ cwd = LazyVim.root.git() }) end, { desc = "Git Log" })
+    map("n", "<leader>gL", function() LazyVim.lazygit.log() end, { desc = "Git Log (cwd)" })
+  end
+
+  -- git blame
+  map("n", "<leader>gb", function() LazyVim.lazygit.blame_line() end, { desc = "Git Blame Line" })
+  map({ "n", "x" }, "<leader>gB", function() LazyVim.lazygit.browse() end, { desc = "Git Browse (open)" })
+  map({ "n", "x" }, "<leader>gY", function()
+    LazyVim.lazygit.browse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
+  end, { desc = "Git Browse (copy)" })
 end
 
--- lazygit
-if vim.fn.executable("lazygit") == 1 then
-  map("n", "<leader>gg", function() Snacks.lazygit( { cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
-  map("n", "<leader>gG", function() Snacks.lazygit() end, { desc = "Lazygit (cwd)" })
-  map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })
-  map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, { desc = "Git Log" })
-  map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
-end
-
-map("n", "<leader>gb", function() Snacks.picker.git_log_line() end, { desc = "Git Blame Line" })
-map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse (open)" })
-map({"n", "x" }, "<leader>gY", function()
-  Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
-end, { desc = "Git Browse (copy)" })
-
-
--- gitsigns
-
-if vim.fn.executable("gitsigns") == 1 then
-  map({ "<leader>gA", function() Snacks.picker.git_stash() end, desc = "Git Add" })
+-- gitsigns - Fixed the condition to check for git instead of gitsigns
+if vim.fn.executable("git") == 1 then
+  map("n", "<leader>gA", "<cmd>Git add .<cr>", { desc = "Git Add All" })
 end
 
 -- quit
@@ -189,27 +189,38 @@ map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 
 -- highlights under cursor
 map("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
-map("n", "<leader>uI", function() vim.treesitter.inspect_tree() vim.api.nvim_input("I") end, { desc = "Inspect Tree" })
+map("n", "<leader>uI", function() 
+  if vim.treesitter.inspect_tree then
+    vim.treesitter.inspect_tree()
+    vim.api.nvim_input("I")
+  end
+end, { desc = "Inspect Tree" })
 
 -- LazyVim Changelog
-map("n", "<leader>L", function() LazyVim.news.changelog() end, { desc = "LazyVim Changelog" })
+map("n", "<leader>L", function() 
+  if LazyVim and LazyVim.news then
+    LazyVim.news.changelog()
+  end
+end, { desc = "LazyVim Changelog" })
 
 -- floating terminal
-map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
-map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
-map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
-map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "which_key_ignore" })
-
--- Terminal Mappings
-map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
-map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+if LazyVim and LazyVim.terminal then
+  map("n", "<leader>fT", function() LazyVim.terminal() end, { desc = "Terminal (cwd)" })
+  map("n", "<leader>ft", function() LazyVim.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+  map("n", "<c-/>",      function() LazyVim.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+  map("n", "<c-_>",      function() LazyVim.terminal(nil, { cwd = LazyVim.root() }) end, { desc = "which_key_ignore" })
+end
 
 -- windows
+map("n", "<leader>w", "<c-w>", { desc = "Windows", remap = true })
 map("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
 map("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
-Snacks.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
-Snacks.toggle.zen():map("<leader>uz")
+
+if LazyVim and LazyVim.toggle then
+  LazyVim.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
+  LazyVim.toggle.zen():map("<leader>uz")
+end
 
 -- tabs
 map("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab" })
@@ -220,12 +231,10 @@ map("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
--- native snippets. only needed on < 0.11, as 0.11 creates these by default
-if vim.fn.has("nvim-0.11") == 0 then
-  map("s", "<Tab>", function()
-    return vim.snippet.active({ direction = 1 }) and "<cmd>lua vim.snippet.jump(1)<cr>" or "<Tab>"
-  end, { expr = true, desc = "Jump Next" })
-  map({ "i", "s" }, "<S-Tab>", function()
-    return vim.snippet.active({ direction = -1 }) and "<cmd>lua vim.snippet.jump(-1)<cr>" or "<S-Tab>"
-  end, { expr = true, desc = "Jump Previous" })
-end
+-- Plugin Management keymaps
+map("n", "<leader>ps", "<cmd>PluginSearch<cr>", { desc = "Search GitHub Plugins" })
+map("n", "<leader>pi", "<cmd>PluginInstall<cr>", { desc = "Install Plugin from GitHub" })
+map("n", "<leader>pl", "<cmd>PluginList<cr>", { desc = "List Installed Plugins" })
+map("n", "<leader>pu", "<cmd>PluginUpdate<cr>", { desc = "Update Plugin" })
+map("n", "<leader>pr", "<cmd>PluginRemove<cr>", { desc = "Remove Plugin" })
+map("n", "<leader>pm", "<cmd>PluginManager<cr>", { desc = "Plugin Manager UI" })
