@@ -129,7 +129,11 @@ return {
         end
 
         local plugins = {}
-        for name, plugin in pairs(lazy.plugins()) do
+        local ok, lazy_plugins = pcall(lazy.plugins)
+        if not ok or type(lazy_plugins) ~= "table" then
+          return plugins
+        end
+        for name, plugin in pairs(lazy_plugins) do
           table.insert(plugins, {
             name = name,
             url = plugin.url or "",
