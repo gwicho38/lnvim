@@ -359,10 +359,22 @@ return {
           end, opts)
         end
         
+        local function get_open_cmd()
+          local os_name = (jit and jit.os:lower()) or (vim.loop and vim.loop.os_uname().sysname:lower()) or ""
+          if os_name:find("windows") then
+            return "start"
+          elseif os_name:find("darwin") or os_name:find("mac") then
+            return "open"
+          else
+            return "xdg-open"
+          end
+        end
+
         vim.keymap.set("n", "<C-o>", function()
-          vim.fn.system("xdg-open " .. repo.html_url)
+          local open_cmd = get_open_cmd()
+          vim.fn.system(open_cmd .. " " .. repo.html_url)
         end, opts)
-        
+
         vim.keymap.set("n", "<Esc>", function()
           vim.api.nvim_win_close(win, true)
         end, opts)
