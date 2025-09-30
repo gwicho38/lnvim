@@ -41,139 +41,71 @@ return {
       }
     })
 
-    -- Add common commands to the palette
+    -- Add commander-specific commands (avoid duplicating keymaps.lua)
+    -- Focus on commands that benefit from discoverability
     commander.add({
       {
-        desc = "Find Files",
-        cmd = require("telescope.builtin").find_files,
-        keys = { "n", "<leader>ff" },
-        cat = "telescope"
+        desc = "Hawtkeys: Find Duplicate Keybindings",
+        cmd = "<cmd>HawtkeysDupes<cr>",
+        cat = "tools"
       },
       {
-        desc = "Live Grep",
-        cmd = require("telescope.builtin").live_grep,
-        keys = { "n", "<leader>fg" },
-        cat = "telescope"
+        desc = "Hawtkeys: Show All Keybindings",
+        cmd = "<cmd>Hawtkeys<cr>",
+        cat = "tools"
       },
       {
-        desc = "Recent Files",
-        cmd = require("telescope.builtin").oldfiles,
-        keys = { "n", "<leader>fr" },
-        cat = "telescope"
-      },
-      {
-        desc = "Buffers",
-        cmd = require("telescope.builtin").buffers,
-        keys = { "n", "<leader>fb" },
-        cat = "telescope"
-      },
-      {
-        desc = "Command History",
-        cmd = require("telescope.builtin").command_history,
-        keys = { "n", "<leader>:" },
-        cat = "telescope"
-      },
-      {
-        desc = "Search History", 
-        cmd = require("telescope.builtin").search_history,
-        keys = { "n", "<leader>/" },
-        cat = "telescope"
-      },
-      {
-        desc = "Help Tags",
-        cmd = require("telescope.builtin").help_tags,
-        keys = { "n", "<leader>fh" },
-        cat = "telescope"
-      },
-      {
-        desc = "Keymaps",
-        cmd = require("telescope.builtin").keymaps,
-        keys = { "n", "<leader>fk" },
-        cat = "telescope"
-      },
-      {
-        desc = "LSP Document Symbols",
-        cmd = require("telescope.builtin").lsp_document_symbols,
-        keys = { "n", "<leader>fs" },
-        cat = "lsp"
-      },
-      {
-        desc = "LSP Workspace Symbols", 
-        cmd = require("telescope.builtin").lsp_workspace_symbols,
-        keys = { "n", "<leader>fS" },
-        cat = "lsp"
-      },
-      {
-        desc = "Git Status",
-        cmd = require("telescope.builtin").git_status,
-        keys = { "n", "<leader>gs" },
-        cat = "git"
-      },
-      {
-        desc = "Git Commits",
-        cmd = require("telescope.builtin").git_commits,
-        keys = { "n", "<leader>gc" },
-        cat = "git"
-      },
-      {
-        desc = "Format Document",
-        cmd = function() LazyVim.format({ force = true }) end,
-        keys = { "n", "<leader>cf" },
-        cat = "code"
-      },
-      {
-        desc = "Toggle Relative Numbers",
-        cmd = function() Snacks.toggle.option("relativenumber", { name = "Relative Number" })() end,
-        keys = { "n", "<leader>uL" },
-        cat = "ui"
-      },
-      {
-        desc = "Toggle Line Numbers",
-        cmd = function() Snacks.toggle.line_number()() end,
-        keys = { "n", "<leader>ul" },
-        cat = "ui"
-      },
-      {
-        desc = "Toggle Dark Mode",
-        cmd = function() Snacks.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" })() end,
-        keys = { "n", "<leader>ub" },
-        cat = "ui"
-      },
-      {
-        desc = "Lazy Plugin Manager",
-        cmd = "<cmd>Lazy<cr>",
-        keys = { "n", "<leader>l" },
-        cat = "lazy"
-      },
-      {
-        desc = "Mason Package Manager", 
+        desc = "Mason: Package Manager",
         cmd = "<cmd>Mason<cr>",
-        cat = "mason"
+        cat = "tools"
       },
       {
-        desc = "LazyVim Changelog",
-        cmd = function() LazyVim.news.changelog() end,
-        keys = { "n", "<leader>L" },
-        cat = "lazyvim"
+        desc = "Copilot: Toggle Enable/Disable",
+        cmd = function()
+          vim.cmd("Copilot toggle")
+        end,
+        cat = "ai"
       },
       {
-        desc = "New File",
-        cmd = "<cmd>enew<cr>",
-        keys = { "n", "<leader>fn" },
-        cat = "file"
+        desc = "Copilot: Status",
+        cmd = "<cmd>Copilot status<cr>",
+        cat = "ai"
       },
       {
-        desc = "Quit All",
-        cmd = "<cmd>qa<cr>",
-        keys = { "n", "<leader>qq" },
-        cat = "file"
+        desc = "Gen: AI Generate",
+        cmd = "<cmd>Gen<cr>",
+        cat = "ai"
       },
       {
-        desc = "Save File",
-        cmd = "<cmd>w<cr>",
-        keys = { "n", "<C-s>" },
-        cat = "file"
-      }
+        desc = "Telescope: Browse Plugins",
+        cmd = "<cmd>Telescope lazy<cr>",
+        cat = "tools"
+      },
+      {
+        desc = "Telescope: Import Navigation",
+        cmd = "<cmd>Telescope import<cr>",
+        cat = "navigation"
+      },
+      {
+        desc = "Transfer: Init SFTP Config",
+        cmd = "<cmd>TransferInit<cr>",
+        cat = "remote"
+      },
+      {
+        desc = "Distant: Connect to Remote",
+        cmd = "<cmd>DistantConnect<cr>",
+        cat = "remote"
+      },
+      {
+        desc = "Hot: Restart Runner",
+        cmd = function() require("hot").restart() end,
+        cat = "dev"
+      },
+      {
+        desc = "Hot: Run Tests",
+        cmd = function() require("hot").test_restart() end,
+        cat = "dev"
+      },
     })
   end,
 }

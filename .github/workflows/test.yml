@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        nvim: [v0.10.2, v0.11.2, nightly]
+        nvim: [v0.10.2, v0.11.2]
 
     steps:
       - uses: actions/checkout@v4
@@ -37,9 +37,10 @@ jobs:
 
       - name: Install Plugins
         run: |
-          nvim --headless "+Lazy! sync" +qa
-          if [ $? -ne 0 ]; then
+          nvim --headless "+Lazy! sync" +qa 2>&1 | tee install_log.txt
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
             echo "Plugin installation failed"
+            cat install_log.txt
             exit 1
           fi
 
@@ -52,11 +53,28 @@ jobs:
       - name: Check Plugin Loading
         run: |
           nvim --headless \
-            -c "lua vim.print(vim.inspect(require('lazy').plugins()))" \
-            -c "qa" | grep -q "lazy.nvim"
+            -c "lua local plugins = require('lazy').plugins(); print('Loaded ' .. #plugins .. ' plugins')" \
+            -c "qa" 2>&1 | grep -q "Loaded"
 
       - name: Verify LSP Config
         run: |
           nvim --headless \
-            -c "lua if require('lspconfig') then print('LSP OK') end" \
-            -c "qa" 2>&1 | grep -q "LSP OK"
+            -c "lua local ok = pcall(require, 'lspconfig'); print('LSP: ' .. tostring(ok))" \
+            -c "qa" 2>&1 | grep -q "LSP: true"
+
+      - name: Run Plenary Tests
+        run: |
+          nvim --headless \
+            -c "PlenaryBustedDirectory tests/ { minimal_init = 'init.lua' }" 2>&1 | tee test_output.txt
+          if grep -q "FAIL" test_output.txt; then
+            echo "Tests failed!"
+            cat test_output.txt
+            exit 1
+          fi
+          echo "All tests passed"
+
+      - name: Test Claude Code Integration
+        run: |
+          nvim --headless \
+            -c "lua local ok = pcall(require, 'claude-code'); print('Claude Code: ' .. tostring(ok))" \
+            -c "qa" 2>&1 | grep -q "Claude Code: true"

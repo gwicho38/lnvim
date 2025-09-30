@@ -20,6 +20,30 @@ jobs:
           version: latest
           args: --check .
 
+  luacheck:
+    name: Lua Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lua
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.4
+
+      - name: Check Lua Syntax
+        run: |
+          find . -name "*.lua" -type f \
+            -not -path "./.git/*" \
+            -not -path "./lazy-lock.json" \
+            -exec lua5.4 -p {} \; 2>&1 | tee lua_syntax_check.log
+          if grep -q "syntax error" lua_syntax_check.log; then
+            echo "Lua syntax errors found!"
+            cat lua_syntax_check.log
+            exit 1
+          fi
+          echo "All Lua files have valid syntax"
+
   validate:
     name: Validate Config
     runs-on: ubuntu-latest
@@ -32,23 +56,20 @@ jobs:
           neovim: true
           version: v0.11.2
 
-      - name: Check Lua Syntax
-        run: |
-          find . -name "*.lua" -type f -exec luac -p {} \; 2>&1 | tee lua_syntax_check.log
-          if grep -q "syntax error" lua_syntax_check.log; then
-            echo "Lua syntax errors found!"
-            exit 1
-          fi
-
       - name: Validate Init
         run: |
-          nvim --headless "+Lazy! sync" +qa
-          if [ $? -ne 0 ]; then
+          nvim --headless "+Lazy! sync" +qa 2>&1 | tee init_log.txt
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
             echo "Neovim init failed"
+            cat init_log.txt
             exit 1
           fi
+          echo "Config loaded successfully"
 
       - name: Check for lazy-lock changes
         run: |
-          git diff --exit-code lazy-lock.json || \
-          (echo "lazy-lock.json has uncommitted changes" && exit 1)
+          if ! git diff --exit-code lazy-lock.json; then
+            echo "⚠️  lazy-lock.json has uncommitted changes"
+            echo "Run 'nvim --headless +Lazy! sync +qa' and commit the changes"
+            exit 1
+          fi
