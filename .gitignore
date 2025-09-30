@@ -6,3 +6,5 @@ debug
 foo.*
 *.log
 data
+.aider*
+.DS_Store

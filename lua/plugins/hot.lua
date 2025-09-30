@@ -1,6 +1,3 @@
--- Enable Current directory
-vim.opt.autochdir = true
-
 return {
   "sachinsenal0x64/hot.nvim",
   config = function()

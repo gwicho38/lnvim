@@ -77,15 +77,24 @@ map("i", ",", ",<c-g>u")
 map("i", ".", ".<c-g>u")
 map("i", ";", ";<c-g>u")
 
+-- jj to escape (VSCode compatibility)
+map("i", "jj", "<Esc>", { desc = "Escape to normal mode" })
+
 -- save file
 map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
 --keywordprg
 map("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
 
--- better indenting
-map("v", "<", "<gv")
-map("v", ">", ">gv")
+-- better indenting (VSCode-style: maintain selection and use proper commands)
+map("v", "<", function()
+  vim.cmd("'<,'>normal! <<")
+  vim.cmd("gv")
+end, { desc = "Indent left and maintain selection" })
+map("v", ">", function()
+  vim.cmd("'<,'>normal! >>")
+  vim.cmd("gv")
+end, { desc = "Indent right and maintain selection" })
 
 -- commenting
 map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })

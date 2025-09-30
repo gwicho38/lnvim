@@ -4,11 +4,10 @@ return {
   config = function()
     require("crates").setup({
       smart_insert = true,
-      show_versions = true,
-      show_version_date = false,
       completion = {
-        enabled = true,
-        autofire = true,
+        cmp = {
+          enabled = true,
+        },
       },
       popup = {
         autofocus = true,

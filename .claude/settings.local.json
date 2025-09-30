@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(stylua:*)",
+      "WebSearch",
+      "Bash(git clean:*)",
+      "Bash(nvim:*)"
+    ],
+    "deny": [],
+    "additionalDirectories": [
+      "/Users/lefv/.local/share/nvim/lazy"
+    ]
+  }
+}
