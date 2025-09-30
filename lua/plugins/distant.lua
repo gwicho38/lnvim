@@ -1,6 +1,7 @@
 return {
   "chipsenkbeil/distant.nvim",
   branch = "v0.3",
+  cmd = { "Distant", "DistantInstall", "DistantConnect", "DistantLaunch" },
   config = function()
     require("distant").setup({
       ["*"] = {

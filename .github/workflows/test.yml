@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Plugin Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        nvim: [v0.10.2, v0.11.2, nightly]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.nvim }}
+
+      - name: Install lazy.nvim
+        run: |
+          mkdir -p ~/.local/share/nvim/lazy
+          git clone --filter=blob:none https://github.com/folke/lazy.nvim.git \
+            --branch=stable ~/.local/share/nvim/lazy/lazy.nvim
+
+      - name: Bootstrap Config
+        run: |
+          mkdir -p ~/.config
+          ln -s $GITHUB_WORKSPACE ~/.config/nvim
+
+      - name: Install Plugins
+        run: |
+          nvim --headless "+Lazy! sync" +qa
+          if [ $? -ne 0 ]; then
+            echo "Plugin installation failed"
+            exit 1
+          fi
+
+      - name: Run Startup Test
+        run: |
+          nvim --headless \
+            -c "lua vim.print('Config loaded successfully')" \
+            -c "qa"
+
+      - name: Check Plugin Loading
+        run: |
+          nvim --headless \
+            -c "lua vim.print(vim.inspect(require('lazy').plugins()))" \
+            -c "qa" | grep -q "lazy.nvim"
+
+      - name: Verify LSP Config
+        run: |
+          nvim --headless \
+            -c "lua if require('lspconfig') then print('LSP OK') end" \
+            -c "qa" 2>&1 | grep -q "LSP OK"

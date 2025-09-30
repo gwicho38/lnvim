@@ -1,0 +1,54 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  stylua:
+    name: Stylua Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stylua Check
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check .
+
+  validate:
+    name: Validate Config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.11.2
+
+      - name: Check Lua Syntax
+        run: |
+          find . -name "*.lua" -type f -exec luac -p {} \; 2>&1 | tee lua_syntax_check.log
+          if grep -q "syntax error" lua_syntax_check.log; then
+            echo "Lua syntax errors found!"
+            exit 1
+          fi
+
+      - name: Validate Init
+        run: |
+          nvim --headless "+Lazy! sync" +qa
+          if [ $? -ne 0 ]; then
+            echo "Neovim init failed"
+            exit 1
+          fi
+
+      - name: Check for lazy-lock changes
+        run: |
+          git diff --exit-code lazy-lock.json || \
+          (echo "lazy-lock.json has uncommitted changes" && exit 1)

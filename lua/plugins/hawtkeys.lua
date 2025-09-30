@@ -4,9 +4,10 @@ return {
     "nvim-lua/plenary.nvim",
     "nvim-treesitter/nvim-treesitter",
   },
-  config = {
-    -- an empty table will work for default config
-    --- if you use functions, or whichkey, or lazy to map keys
-    --- then please see the API below for options
+  cmd = { "Hawtkeys", "HawtkeysAll", "HawtkeysDupes" },
+  opts = {
+    -- Detect duplicate keybindings and show warnings
+    leader = " ", -- Space as leader
+    homerow = 2, -- Distance from home row (affects scoring)
   },
 }
