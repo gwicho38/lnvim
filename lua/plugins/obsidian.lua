@@ -57,12 +57,49 @@ return {
       return out
     end,
 
-    -- Templates
+    -- Templates with dynamic substitutions (like Templater)
     templates = {
       folder = "template",
       date_format = "%Y-%m-%d",
       time_format = "%H:%M",
-      substitutions = {},
+      substitutions = {
+        -- Random ID (timestamp-based like Zettelkasten)
+        random_id = function()
+          return tostring(os.date("%Y%m%d%H%M%S"))
+        end,
+        -- Creation date/time
+        creation_date = function()
+          return os.date("%Y-%m-%d %H:%M")
+        end,
+        -- Current date/time with custom format
+        now = function()
+          return os.date("%Y-%m-%d.%H%M%S")
+        end,
+        -- ISO timestamp
+        timestamp = function()
+          return os.date("%Y-%m-%dT%H:%M:%S") .. "Z"
+        end,
+        -- Date only
+        date = function()
+          return os.date("%Y-%m-%d")
+        end,
+        -- Time only
+        time = function()
+          return os.date("%H:%M:%S")
+        end,
+        -- Year
+        year = function()
+          return os.date("%Y")
+        end,
+        -- Month name
+        month = function()
+          return os.date("%B")
+        end,
+        -- Day of month
+        day = function()
+          return os.date("%d")
+        end,
+      },
     },
 
     -- Completion settings (disabled - enable if you install nvim-cmp)
