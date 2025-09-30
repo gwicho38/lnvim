@@ -149,44 +149,8 @@ map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 
 -- stylua: ignore start
 
--- toggle options
-if LazyVim and LazyVim.toggle then
-  LazyVim.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
-  LazyVim.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
-  LazyVim.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
-  LazyVim.toggle.diagnostics():map("<leader>ud")
-  LazyVim.toggle.line_number():map("<leader>ul")
-  LazyVim.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
-  LazyVim.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
-  LazyVim.toggle.treesitter():map("<leader>uT")
-  LazyVim.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" }):map("<leader>ub")
-  LazyVim.toggle.dim():map("<leader>uD")
-  LazyVim.toggle.animate():map("<leader>ua")
-  LazyVim.toggle.indent():map("<leader>ug")
-  LazyVim.toggle.scroll():map("<leader>uS")
-  LazyVim.toggle.profiler():map("<leader>dpp")
-  LazyVim.toggle.profiler_highlights():map("<leader>dph")
-
-  if vim.lsp.inlay_hint then
-    LazyVim.toggle.inlay_hints():map("<leader>uh")
-  end
-
-  -- lazygit
-  if LazyVim.has("lazygit.nvim") then
-    map("n", "<leader>gg", function() LazyVim.lazygit( { cwd = LazyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
-    map("n", "<leader>gG", function() LazyVim.lazygit() end, { desc = "Lazygit (cwd)" })
-    map("n", "<leader>gf", function() LazyVim.lazygit.log_file() end, { desc = "Git Current File History" })
-    map("n", "<leader>gl", function() LazyVim.lazygit.log({ cwd = LazyVim.root.git() }) end, { desc = "Git Log" })
-    map("n", "<leader>gL", function() LazyVim.lazygit.log() end, { desc = "Git Log (cwd)" })
-  end
-
-  -- git blame
-  map("n", "<leader>gb", function() LazyVim.lazygit.blame_line() end, { desc = "Git Blame Line" })
-  map({ "n", "x" }, "<leader>gB", function() LazyVim.lazygit.browse() end, { desc = "Git Browse (open)" })
-  map({ "n", "x" }, "<leader>gY", function()
-    LazyVim.lazygit.browse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
-  end, { desc = "Git Browse (copy)" })
-end
+-- toggle options (handled by LazyVim core or Snacks)
+-- These are automatically set up by LazyVim, no need to manually configure
 
 -- lazygit
 if vim.fn.executable("lazygit") == 1 then
@@ -246,11 +210,6 @@ map("n", "<leader>w", "<c-w>", { desc = "Windows", remap = true })
 map("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
 map("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
-
-if LazyVim and LazyVim.toggle then
-  LazyVim.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
-  LazyVim.toggle.zen():map("<leader>uz")
-end
 
 -- tabs
 map("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab" })
