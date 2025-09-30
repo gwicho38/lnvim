@@ -160,6 +160,19 @@ return {
       sections = {
         { section = "header" },
         { section = "keys", gap = 1, padding = 1 },
+        {
+          section = "recent_files",
+          title = "Recent Files",
+          limit = 8,
+          padding = 1,
+          cwd = true,
+        },
+        {
+          section = "projects",
+          title = "Recent Projects",
+          limit = 5,
+          padding = 1,
+        },
         { section = "startup" },
       },
     },

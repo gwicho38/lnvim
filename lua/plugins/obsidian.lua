@@ -4,7 +4,6 @@ return {
   ft = "markdown",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "hrsh7th/nvim-cmp",
     "nvim-telescope/telescope.nvim",
     "nvim-treesitter/nvim-treesitter",
   },
@@ -66,11 +65,11 @@ return {
       substitutions = {},
     },
 
-    -- Completion settings
-    completion = {
-      nvim_cmp = true,
-      min_chars = 2,
-    },
+    -- Completion settings (disabled - enable if you install nvim-cmp)
+    -- completion = {
+    --   nvim_cmp = true,
+    --   min_chars = 2,
+    -- },
 
     -- Mappings (can be customized)
     mappings = {
