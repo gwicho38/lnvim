@@ -35,7 +35,7 @@ return {
       -- Save notes to appropriate domain directory
       -- For now, default to notes/ directory
       local path = spec.dir / "notes"
-      return path:tostring() .. "/" .. spec.id .. ".md"
+      return tostring(path) .. "/" .. spec.id .. ".md"
     end,
 
     -- Frontmatter
