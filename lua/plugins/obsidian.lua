@@ -236,6 +236,15 @@ return {
 
     -- Update vault TODOs
     { "<leader>oT", "<cmd>ObsidianUpdateTodos<cr>", desc = "Update vault TODOs" },
+
+    -- Open vault (switch project context)
+    { "<leader>ov", function()
+      local vault_path = vim.fn.expand("~/repos/lefv-vault")
+      vim.cmd("cd " .. vault_path)
+      vim.notify("Switched to Obsidian vault: " .. vault_path, vim.log.levels.INFO)
+      -- Open file picker in vault
+      require("telescope.builtin").find_files({ cwd = vault_path })
+    end, desc = "Open vault" },
   },
 
   config = function(_, opts)
