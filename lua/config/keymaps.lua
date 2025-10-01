@@ -272,4 +272,33 @@ map("n", ";l", function()
   if new_line ~= line then
     vim.api.nvim_set_current_line(new_line)
   end
-end, { desc = "Toggle checkbox" })
+end, { desc = "Toggle checkbox", noremap = true, silent = true })
+
+-- Alternative: Use Space+x for checkbox toggle (more reliable)
+map("n", "<leader>x", function()
+  -- Try Obsidian checkbox toggle first
+  local ok, obsidian = pcall(require, "obsidian")
+  if ok and obsidian.util then
+    local success = pcall(obsidian.util.toggle_checkbox)
+    if success then
+      return
+    end
+  end
+  -- Fallback: simple checkbox toggle
+  local line = vim.api.nvim_get_current_line()
+  local new_line = line
+  if line:match("^%s*- %[ %]") then
+    new_line = line:gsub("^(%s*- )%[ %]", "%1[x]")
+  elseif line:match("^%s*- %[x%]") then
+    new_line = line:gsub("^(%s*- )%[x%]", "%1[ ]")
+  elseif line:match("^%s*- %[>%]") then
+    new_line = line:gsub("^(%s*- )%[>%]", "%1[ ]")
+  elseif line:match("^%s*- %[~%]") then
+    new_line = line:gsub("^(%s*- )%[~%]", "%1[ ]")
+  elseif line:match("^%s*- %[!%]") then
+    new_line = line:gsub("^(%s*- )%[!%]", "%1[ ]")
+  end
+  if new_line ~= line then
+    vim.api.nvim_set_current_line(new_line)
+  end
+end, { desc = "Toggle checkbox", noremap = true, silent = true })
