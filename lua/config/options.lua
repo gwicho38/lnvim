@@ -10,6 +10,9 @@ vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor/lCursor,r-c
 vim.opt.spelllang = "en_us"
 vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add" -- Global dictionary
 
+-- Hover preview timing
+vim.opt.updatetime = 500 -- Faster hover/diagnostics (default 4000ms)
+
 -- Disable minimap-like features for VSCode consistency
 vim.opt.list = false -- Don't show whitespace characters by default
 vim.opt.winbar = "" -- Disable winbar (similar to disabling minimap)
