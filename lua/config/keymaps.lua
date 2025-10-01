@@ -228,33 +228,25 @@ map("n", "<leader>pu", "<cmd>PluginUpdate<cr>", { desc = "Update Plugin" })
 map("n", "<leader>pr", "<cmd>PluginRemove<cr>", { desc = "Remove Plugin" })
 map("n", "<leader>pm", "<cmd>PluginManager<cr>", { desc = "Plugin Manager UI" })
 
--- VSCode-style keybindings (macOS CMD key)
--- CMD+SHIFT+P: Command Palette
-map({ "n", "v", "i" }, "<D-S-p>", function()
-  if vim.fn.mode() == "i" then
-    vim.cmd("stopinsert")
-  end
+-- VSCode-style keybindings (using semicolon prefix for Mac terminal compatibility)
+-- ;p: Command Palette
+map("n", ";p", function()
   require("telescope.builtin").commands()
 end, { desc = "Command Palette" })
 
--- CMD+C: Copy (yank to system clipboard)
-map("v", "<D-c>", '"+y', { desc = "Copy to clipboard" })
-map("n", "<D-c>", '"+yy', { desc = "Copy line to clipboard" })
+-- ;c: Copy (yank to system clipboard)
+map("v", ";c", '"+y', { desc = "Copy to clipboard" })
+map("n", ";c", '"+yy', { desc = "Copy line to clipboard" })
 
--- CMD+X: Cut (delete to system clipboard)
-map("v", "<D-x>", '"+d', { desc = "Cut to clipboard" })
-map("n", "<D-x>", '"+dd', { desc = "Cut line to clipboard" })
+-- ;x: Cut (delete to system clipboard)
+map("v", ";x", '"+d', { desc = "Cut to clipboard" })
+map("n", ";x", '"+dd', { desc = "Cut line to clipboard" })
 
--- CMD+V: Paste (from system clipboard)
-map({ "n", "v" }, "<D-v>", '"+p', { desc = "Paste from clipboard" })
-map("i", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
-map("c", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
+-- ;v: Paste (from system clipboard)
+map({ "n", "v" }, ";v", '"+p', { desc = "Paste from clipboard" })
 
--- CMD+L: Toggle checkbox (Gmail-style)
-map({ "n", "i" }, "<D-l>", function()
-  if vim.fn.mode() == "i" then
-    vim.cmd("stopinsert")
-  end
+-- ;l: Toggle checkbox (Gmail-style)
+map("n", ";l", function()
   -- Try Obsidian checkbox toggle first
   local ok, obsidian = pcall(require, "obsidian")
   if ok and obsidian.util then
