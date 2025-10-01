@@ -5,11 +5,12 @@ return {
     event = "VeryLazy",
     opts = {
       init = function()
-        -- Require providers
+        -- Require providers in priority order
         require("hover.providers.lsp")
+        -- Only enable man for sh/bash/zsh files
+        require("hover.providers.man")
         require("hover.providers.gh")
         require("hover.providers.gh_user")
-        require("hover.providers.man")
         require("hover.providers.dictionary")
       end,
       preview_opts = {
@@ -22,6 +23,16 @@ return {
       },
       mouse_delay = 1000,
     },
+    config = function(_, opts)
+      require("hover").setup(opts)
+
+      -- Override keywordprg for code files to use LSP hover only
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          vim.bo[args.buf].keywordprg = ":lua vim.lsp.buf.hover()"
+        end,
+      })
+    end,
     keys = {
       {
         "K",
