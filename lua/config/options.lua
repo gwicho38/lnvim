@@ -13,6 +13,10 @@ vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add" -- Global 
 -- Hover preview timing
 vim.opt.updatetime = 500 -- Faster hover/diagnostics (default 4000ms)
 
+-- Mouse settings
+vim.opt.mouse = "a" -- Enable mouse in all modes
+vim.opt.mousescroll = "ver:3,hor:0" -- Vertical scroll only (disable horizontal)
+
 -- Disable minimap-like features for VSCode consistency
 vim.opt.list = false -- Don't show whitespace characters by default
 -- winbar enabled by barbecue.nvim for context breadcrumbs
