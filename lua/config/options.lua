@@ -15,7 +15,7 @@ vim.opt.updatetime = 500 -- Faster hover/diagnostics (default 4000ms)
 
 -- Disable minimap-like features for VSCode consistency
 vim.opt.list = false -- Don't show whitespace characters by default
-vim.opt.winbar = "" -- Disable winbar (similar to disabling minimap)
+-- winbar enabled by barbecue.nvim for context breadcrumbs
 
 -- Set cursor color (VSCode compatibility)
 vim.cmd([[

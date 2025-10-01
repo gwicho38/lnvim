@@ -10,7 +10,8 @@ return {
           { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
           { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
           { icon = " ", key = "s", desc = "Restore Session", section = "session" },
-          
+          { icon = " ", key = "S", desc = "Load Named Session", action = ":SessionManager load_session<cr>" },
+
           -- Custom shortcuts
           { icon = " ", key = "o", desc = "Obsidian Notes", action = function()
             -- Load obsidian plugin and open vault search
