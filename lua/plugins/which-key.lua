@@ -1,56 +1,42 @@
 return {
   "folke/which-key.nvim",
   event = "VeryLazy",
-  opts = {
-    preset = "modern",
-    delay = 300, -- Time in ms before which-key popup appears
-    win = {
-      -- Centered window configuration
+  opts = function(_, opts)
+    -- Merge with LazyVim defaults instead of replacing
+    opts = opts or {}
+
+    -- Override window configuration
+    opts.win = vim.tbl_deep_extend("force", opts.win or {}, {
       border = "rounded",
-      position = "bottom", -- Position at bottom for better centering
-      padding = { 1, 2 }, -- Vertical, horizontal padding
+      position = "bottom",
+      padding = { 1, 2 },
       wo = {
-        winblend = 0, -- Transparency (0 = opaque)
+        winblend = 0,
       },
-    },
-    layout = {
-      width = { min = 20, max = 50 }, -- Width constraints
-      spacing = 3, -- Spacing between columns
-      align = "center", -- Center align the content
-    },
-    show_help = true,
-    show_keys = true,
-    triggers = {
-      { "<leader>", mode = { "n", "v" } },
-      { ";", mode = { "n", "v" } },
-      { "g", mode = { "n", "v" } },
-      { "z", mode = { "n", "v" } },
-      { "[", mode = { "n", "v" } },
-      { "]", mode = { "n", "v" } },
-    },
-    spec = {
-      {
-        mode = { "n", "v" },
-        { "<leader>b", group = "buffer" },
-        { "<leader>c", group = "code" },
-        { "<leader>f", group = "file/find" },
-        { "<leader>g", group = "git" },
-        { "<leader>o", group = "obsidian" },
-        { "<leader>p", group = "plugins" },
-        { "<leader>q", group = "quit/session" },
-        { "<leader>s", group = "search" },
-        { "<leader>S", group = "session" },
-        { "<leader>T", group = "tasks" },
-        { "<leader>u", group = "ui" },
-        { "<leader>w", group = "windows" },
-        { "<leader>x", group = "diagnostics/quickfix" },
-        { "<leader><tab>", group = "tabs" },
-        { "[", group = "prev" },
-        { "]", group = "next" },
-        { "g", group = "goto" },
-        { "z", group = "fold" },
-        { ";", group = "quick actions" },
-      },
-    },
-  },
+    })
+
+    -- Override layout
+    opts.layout = vim.tbl_deep_extend("force", opts.layout or {}, {
+      width = { min = 20, max = 50 },
+      spacing = 3,
+      align = "center",
+    })
+
+    -- Set delay
+    opts.delay = 200 -- Reduced to 200ms for faster response
+
+    -- Add our custom groups (don't duplicate LazyVim's)
+    opts.spec = opts.spec or {}
+
+    -- Add only our custom groups that LazyVim doesn't define
+    vim.list_extend(opts.spec, {
+      { "<leader>o", group = "obsidian", mode = { "n", "v" } },
+      { "<leader>p", group = "plugins", mode = { "n", "v" } },
+      { "<leader>S", group = "session", mode = { "n", "v" } },
+      { "<leader>T", group = "tasks", mode = { "n", "v" } },
+      { ";", group = "quick actions", mode = { "n", "v" } },
+    })
+
+    return opts
+  end,
 }

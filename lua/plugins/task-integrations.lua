@@ -96,16 +96,4 @@ return {
       { "<leader>TO", "<cmd>edit ~/repos/lefv-vault/TODO.md<cr>", desc = "Open Obsidian TODOs" },
     },
   },
-
-  -- Update which-key groups
-  {
-    "folke/which-key.nvim",
-    opts = function(_, opts)
-      opts.spec = opts.spec or {}
-      table.insert(opts.spec, {
-        { "<leader>T", group = "tasks" },
-      })
-      return opts
-    end,
-  },
 }
