@@ -6,6 +6,10 @@
 vim.opt.clipboard = "unnamedplus" -- Use system clipboard
 vim.opt.guicursor = "n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,o:hor50-Cursor/lCursor"
 
+-- Spell checking
+vim.opt.spelllang = "en_us"
+vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add" -- Global dictionary
+
 -- Disable minimap-like features for VSCode consistency
 vim.opt.list = false -- Don't show whitespace characters by default
 vim.opt.winbar = "" -- Disable winbar (similar to disabling minimap)

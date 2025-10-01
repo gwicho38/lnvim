@@ -12,48 +12,17 @@ return {
           { icon = " ", key = "s", desc = "Restore Session", section = "session" },
           
           -- Custom shortcuts
-          { icon = "󱞁 ", key = "z", desc = "Zettelkasten Notes", action = function()
-            -- Create notes directory if it doesn't exist
-            local notes_dir = vim.fn.expand("~/notes")
-            if vim.fn.isdirectory(notes_dir) == 0 then
-              vim.fn.mkdir(notes_dir, "p")
-            end
-            
-            -- Open telescope file picker in notes directory
-            require('telescope.builtin').find_files({
-              prompt_title = "🧠 Zettelkasten Notes",
-              cwd = notes_dir,
-              find_command = { "find", notes_dir, "-type", "f", "-name", "*.md" },
-              attach_mappings = function(prompt_bufnr, map)
-                local actions = require('telescope.actions')
-                local action_state = require('telescope.actions.state')
-                
-                -- Create new note with Ctrl+n
-                map('i', '<C-n>', function()
-                  actions.close(prompt_bufnr)
-                  local note_name = vim.fn.input("Note name: ")
-                  if note_name ~= "" then
-                    local note_file = notes_dir .. "/" .. note_name .. ".md"
-                    vim.cmd("edit " .. note_file)
-                    -- Add basic template
-                    vim.api.nvim_buf_set_lines(0, 0, -1, false, {
-                      "# " .. note_name,
-                      "",
-                      "Created: " .. os.date("%Y-%m-%d %H:%M"),
-                      "",
-                      "## Tags",
-                      "",
-                      "## Content",
-                      "",
-                    })
-                  end
-                end)
-                
-                return true
-              end,
-            })
+          { icon = " ", key = "o", desc = "Obsidian Notes", action = function()
+            -- Load obsidian plugin and open vault search
+            require("lazy").load({ plugins = { "obsidian.nvim" } })
+            vim.cmd("ObsidianSearch")
           end },
-          
+          { icon = " ", key = "t", desc = "Today's Note", action = function()
+            -- Load obsidian plugin and open today's note
+            require("lazy").load({ plugins = { "obsidian.nvim" } })
+            vim.cmd("ObsidianToday")
+          end },
+
           { icon = "󰏖 ", key = "p", desc = "Browse Plugins", action = function()
             -- Open telescope to browse available plugins
             local pickers = require('telescope.pickers')

@@ -20,7 +20,6 @@ return {
       folder = "notes",
       date_format = "%Y%m%d",
       alias_format = "%B %-d, %Y",
-      template = "template/Note.md",
     },
 
     -- Note ID generation (Zettelkasten timestamp format)
@@ -234,6 +233,9 @@ return {
 
     -- Open in Obsidian app (if needed)
     { "<leader>oO", "<cmd>ObsidianOpen<cr>", desc = "Open in Obsidian app" },
+
+    -- Update vault TODOs
+    { "<leader>oT", "<cmd>ObsidianUpdateTodos<cr>", desc = "Update vault TODOs" },
   },
 
   config = function(_, opts)
@@ -245,6 +247,77 @@ return {
       callback = function()
         vim.opt_local.conceallevel = 2
       end,
+    })
+
+    -- Function to update TODO.md
+    local function update_vault_todos()
+      local vault_path = vim.fn.expand("~/repos/lefv-vault")
+      local todo_file = vault_path .. "/TODO.md"
+
+      -- Find all TODO items in vault
+      local todos = {}
+      local handle = io.popen('cd "' .. vault_path .. '" && grep -rn "TODO\\|\\[ \\]" --include="*.md" --exclude="TODO.md" .')
+      if handle then
+        for line in handle:lines() do
+          -- Parse grep output: ./path/file.md:line_number:content
+          local file, line_num, content = line:match("^%./(.-):(%d+):(.*)")
+          if file and line_num and content then
+            table.insert(todos, {
+              file = file,
+              line = line_num,
+              content = content:match("^%s*(.-)%s*$"), -- trim whitespace
+            })
+          end
+        end
+        handle:close()
+      end
+
+      -- Generate TODO.md content
+      local lines = {
+        "# Vault TODO",
+        "",
+        "Auto-generated list of all TODO items in the vault.",
+        "",
+        "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"),
+        "",
+      }
+
+      if #todos > 0 then
+        table.insert(lines, "## TODOs (" .. #todos .. ")")
+        table.insert(lines, "")
+
+        for _, todo in ipairs(todos) do
+          -- Create checkbox with wiki link
+          local note_name = todo.file:match("([^/]+)%.md$") or todo.file
+          local link = string.format("- [ ] [[%s#L%s|%s:%s]] %s",
+            todo.file:gsub("%.md$", ""),
+            todo.line,
+            note_name,
+            todo.line,
+            todo.content
+          )
+          table.insert(lines, link)
+        end
+      else
+        table.insert(lines, "No TODOs found in vault.")
+      end
+
+      -- Write TODO.md file
+      local file = io.open(todo_file, "w")
+      if file then
+        file:write(table.concat(lines, "\n") .. "\n")
+        file:close()
+        vim.notify("Updated TODO.md with " .. #todos .. " items", vim.log.levels.INFO)
+      end
+    end
+
+    -- Create command to manually trigger TODO update
+    vim.api.nvim_create_user_command("ObsidianUpdateTodos", update_vault_todos, {})
+
+    -- Auto-update top-level TODO.md with all TODOs in vault
+    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+      pattern = "*/lefv-vault/*.md",
+      callback = update_vault_todos,
     })
   end,
 }
