@@ -3,6 +3,7 @@ return {
   event = "VeryLazy",
   opts = {
     preset = "modern",
+    delay = 300, -- Time in ms before which-key popup appears
     win = {
       -- Centered window configuration
       border = "rounded",
@@ -19,7 +20,14 @@ return {
     },
     show_help = true,
     show_keys = true,
-    -- Disable default which-key groups to reduce clutter
+    triggers = {
+      { "<leader>", mode = { "n", "v" } },
+      { ";", mode = { "n", "v" } },
+      { "g", mode = { "n", "v" } },
+      { "z", mode = { "n", "v" } },
+      { "[", mode = { "n", "v" } },
+      { "]", mode = { "n", "v" } },
+    },
     spec = {
       {
         mode = { "n", "v" },
@@ -32,6 +40,7 @@ return {
         { "<leader>q", group = "quit/session" },
         { "<leader>s", group = "search" },
         { "<leader>S", group = "session" },
+        { "<leader>T", group = "tasks" },
         { "<leader>u", group = "ui" },
         { "<leader>w", group = "windows" },
         { "<leader>x", group = "diagnostics/quickfix" },
