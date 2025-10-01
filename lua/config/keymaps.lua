@@ -227,3 +227,25 @@ map("n", "<leader>pl", "<cmd>PluginList<cr>", { desc = "List Installed Plugins" 
 map("n", "<leader>pu", "<cmd>PluginUpdate<cr>", { desc = "Update Plugin" })
 map("n", "<leader>pr", "<cmd>PluginRemove<cr>", { desc = "Remove Plugin" })
 map("n", "<leader>pm", "<cmd>PluginManager<cr>", { desc = "Plugin Manager UI" })
+
+-- VSCode-style keybindings (macOS CMD key)
+-- CMD+SHIFT+P: Command Palette
+map({ "n", "v", "i" }, "<D-S-p>", function()
+  if vim.fn.mode() == "i" then
+    vim.cmd("stopinsert")
+  end
+  require("telescope.builtin").commands()
+end, { desc = "Command Palette" })
+
+-- CMD+C: Copy (yank to system clipboard)
+map("v", "<D-c>", '"+y', { desc = "Copy to clipboard" })
+map("n", "<D-c>", '"+yy', { desc = "Copy line to clipboard" })
+
+-- CMD+X: Cut (delete to system clipboard)
+map("v", "<D-x>", '"+d', { desc = "Cut to clipboard" })
+map("n", "<D-x>", '"+dd', { desc = "Cut line to clipboard" })
+
+-- CMD+V: Paste (from system clipboard)
+map({ "n", "v" }, "<D-v>", '"+p', { desc = "Paste from clipboard" })
+map("i", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
+map("c", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })

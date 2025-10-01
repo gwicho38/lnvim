@@ -8,3 +8,4 @@ foo.*
 data
 .aider*
 .DS_Store
+spell/*.spl
