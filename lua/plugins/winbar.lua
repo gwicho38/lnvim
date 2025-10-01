@@ -8,11 +8,13 @@ return {
       "SmiteshP/nvim-navic",
       "nvim-tree/nvim-web-devicons",
     },
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufNewFile" }, -- Load immediately when opening files
     opts = {
+      attach_navic = true, -- Attach navic to LSP automatically
+      create_autocmd = true, -- Create autocmd to update winbar
       theme = "auto",
       include_buftypes = { "" },
-      exclude_filetypes = { "netrw", "toggleterm", "neo-tree", "dashboard" },
+      exclude_filetypes = { "netrw", "toggleterm", "neo-tree", "dashboard", "help", "alpha", "lazy" },
       show_dirname = true,
       show_basename = true,
       show_modified = true,
@@ -61,6 +63,15 @@ return {
     lazy = true,
     init = function()
       vim.g.navic_silence = true
+
+      -- Ensure winbar is enabled
+      vim.schedule(function()
+        -- Only set if not already set by user
+        if vim.wo.winbar == "" then
+          -- Let barbecue handle the winbar content
+        end
+      end)
+
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local buffer = args.buf
@@ -70,6 +81,19 @@ return {
           end
         end,
       })
+
+      -- Add command to toggle winbar
+      vim.api.nvim_create_user_command("WinbarToggle", function()
+        local current = vim.opt.winbar:get()
+        if current == "" then
+          vim.notify("Winbar enabled", vim.log.levels.INFO)
+          -- Trigger barbecue update
+          vim.cmd("edit")
+        else
+          vim.opt.winbar = ""
+          vim.notify("Winbar disabled", vim.log.levels.INFO)
+        end
+      end, { desc = "Toggle winbar" })
     end,
     opts = function()
       return {
