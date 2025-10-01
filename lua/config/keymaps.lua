@@ -249,3 +249,35 @@ map("n", "<D-x>", '"+dd', { desc = "Cut line to clipboard" })
 map({ "n", "v" }, "<D-v>", '"+p', { desc = "Paste from clipboard" })
 map("i", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
 map("c", "<D-v>", '<C-r>+', { desc = "Paste from clipboard" })
+
+-- CMD+L: Toggle checkbox (Gmail-style)
+map({ "n", "i" }, "<D-l>", function()
+  if vim.fn.mode() == "i" then
+    vim.cmd("stopinsert")
+  end
+  -- Try Obsidian checkbox toggle first
+  local ok, obsidian = pcall(require, "obsidian")
+  if ok and obsidian.util then
+    local success = pcall(obsidian.util.toggle_checkbox)
+    if success then
+      return
+    end
+  end
+  -- Fallback: simple checkbox toggle
+  local line = vim.api.nvim_get_current_line()
+  local new_line = line
+  if line:match("^%s*- %[ %]") then
+    new_line = line:gsub("^(%s*- )%[ %]", "%1[x]")
+  elseif line:match("^%s*- %[x%]") then
+    new_line = line:gsub("^(%s*- )%[x%]", "%1[ ]")
+  elseif line:match("^%s*- %[>%]") then
+    new_line = line:gsub("^(%s*- )%[>%]", "%1[ ]")
+  elseif line:match("^%s*- %[~%]") then
+    new_line = line:gsub("^(%s*- )%[~%]", "%1[ ]")
+  elseif line:match("^%s*- %[!%]") then
+    new_line = line:gsub("^(%s*- )%[!%]", "%1[ ]")
+  end
+  if new_line ~= line then
+    vim.api.nvim_set_current_line(new_line)
+  end
+end, { desc = "Toggle checkbox" })
