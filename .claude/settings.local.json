@@ -4,7 +4,11 @@
       "Bash(stylua:*)",
       "WebSearch",
       "Bash(git clean:*)",
-      "Bash(nvim:*)"
+      "Bash(nvim:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: add VSCode-style keyboard shortcuts\n\n- CMD+SHIFT+P opens command palette (Telescope commands)\n- CMD+C copies to system clipboard (visual mode or line)\n- CMD+X cuts to system clipboard (visual mode or line)\n- CMD+V pastes from system clipboard (all modes)\n- Works in normal, insert, visual, and command modes\nEOF\n)\")",
+      "Bash(git tag:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "additionalDirectories": [
