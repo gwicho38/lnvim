@@ -228,6 +228,10 @@ map("n", "<leader>pu", "<cmd>PluginUpdate<cr>", { desc = "Update Plugin" })
 map("n", "<leader>pr", "<cmd>PluginRemove<cr>", { desc = "Remove Plugin" })
 map("n", "<leader>pm", "<cmd>PluginManager<cr>", { desc = "Plugin Manager UI" })
 
+-- Explorer and Tree-sitter view
+map("n", "<leader>[", "<cmd>Neotree toggle<cr>", { desc = "Toggle File Explorer" })
+map("n", "<leader>]", "<cmd>InspectTree<cr>", { desc = "Tree-sitter Inspector" })
+
 -- VSCode-style keybindings (using semicolon prefix for Mac terminal compatibility)
 -- ;p: Command Palette
 map("n", ";p", function()
