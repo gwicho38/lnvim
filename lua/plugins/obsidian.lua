@@ -258,27 +258,75 @@ return {
       end,
     })
 
+    -- Function to toggle checkbox in source file
+    local function toggle_todo_in_source(file_path, line_num)
+      local vault_path = vim.fn.expand("~/repos/lefv-vault")
+      local full_path = vault_path .. "/" .. file_path
+
+      -- Read the file
+      local lines = vim.fn.readfile(full_path)
+      if not lines or #lines < tonumber(line_num) then
+        vim.notify("Could not read source file", vim.log.levels.ERROR)
+        return false
+      end
+
+      -- Toggle the checkbox on the specified line
+      local line = lines[tonumber(line_num)]
+      local new_line = line
+
+      if line:match("%[ %]") then
+        new_line = line:gsub("%[ %]", "[x]", 1)
+      elseif line:match("%[x%]") then
+        new_line = line:gsub("%[x%]", "[ ]", 1)
+      else
+        vim.notify("No checkbox found on this line", vim.log.levels.WARN)
+        return false
+      end
+
+      -- Update the line
+      lines[tonumber(line_num)] = new_line
+
+      -- Write back to file
+      vim.fn.writefile(lines, full_path)
+      vim.notify("Updated " .. file_path .. ":" .. line_num, vim.log.levels.INFO)
+      return true
+    end
+
     -- Function to update TODO.md
     local function update_vault_todos()
       local vault_path = vim.fn.expand("~/repos/lefv-vault")
       local todo_file = vault_path .. "/TODO.md"
 
-      -- Find all TODO items in vault
+      -- Find all TODO items in vault (both checked and unchecked)
       local todos = {}
-      local handle = io.popen('cd "' .. vault_path .. '" && grep -rn "TODO\\|\\[ \\]" --include="*.md" --exclude="TODO.md" .')
+      local handle = io.popen('cd "' .. vault_path .. '" && grep -rn "TODO\\|\\[ \\]\\|\\[x\\]" --include="*.md" --exclude="TODO.md" .')
       if handle then
         for line in handle:lines() do
           -- Parse grep output: ./path/file.md:line_number:content
           local file, line_num, content = line:match("^%./(.-):(%d+):(.*)")
           if file and line_num and content then
+            -- Determine if checked
+            local is_checked = content:match("%[x%]") ~= nil
             table.insert(todos, {
               file = file,
               line = line_num,
               content = content:match("^%s*(.-)%s*$"), -- trim whitespace
+              checked = is_checked,
             })
           end
         end
         handle:close()
+      end
+
+      -- Separate unchecked and checked items
+      local unchecked = {}
+      local checked = {}
+      for _, todo in ipairs(todos) do
+        if todo.checked then
+          table.insert(checked, todo)
+        else
+          table.insert(unchecked, todo)
+        end
       end
 
       -- Generate TODO.md content
@@ -286,28 +334,53 @@ return {
         "# Vault TODO",
         "",
         "Auto-generated list of all TODO items in the vault.",
+        "Toggle checkboxes with `<leader>x` or `;l` to update source files.",
         "",
         "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"),
         "",
       }
 
-      if #todos > 0 then
-        table.insert(lines, "## TODOs (" .. #todos .. ")")
+      if #unchecked > 0 then
+        table.insert(lines, "## Active TODOs (" .. #unchecked .. ")")
         table.insert(lines, "")
 
-        for _, todo in ipairs(todos) do
-          -- Create checkbox with wiki link
+        for _, todo in ipairs(unchecked) do
+          -- Create checkbox with wiki link and store metadata
           local note_name = todo.file:match("([^/]+)%.md$") or todo.file
-          local link = string.format("- [ ] [[%s#L%s|%s:%s]] %s",
+          local link = string.format("- [ ] [[%s#L%s|%s:%s]] %s <!-- src:%s:%s -->",
             todo.file:gsub("%.md$", ""),
             todo.line,
             note_name,
             todo.line,
-            todo.content
+            todo.content,
+            todo.file,
+            todo.line
           )
           table.insert(lines, link)
         end
-      else
+        table.insert(lines, "")
+      end
+
+      if #checked > 0 then
+        table.insert(lines, "## Completed (" .. #checked .. ")")
+        table.insert(lines, "")
+
+        for _, todo in ipairs(checked) do
+          local note_name = todo.file:match("([^/]+)%.md$") or todo.file
+          local link = string.format("- [x] [[%s#L%s|%s:%s]] %s <!-- src:%s:%s -->",
+            todo.file:gsub("%.md$", ""),
+            todo.line,
+            note_name,
+            todo.line,
+            todo.content,
+            todo.file,
+            todo.line
+          )
+          table.insert(lines, link)
+        end
+      end
+
+      if #todos == 0 then
         table.insert(lines, "No TODOs found in vault.")
       end
 
@@ -316,17 +389,61 @@ return {
       if file then
         file:write(table.concat(lines, "\n") .. "\n")
         file:close()
-        vim.notify("Updated TODO.md with " .. #todos .. " items", vim.log.levels.INFO)
+        vim.notify("Updated TODO.md: " .. #unchecked .. " active, " .. #checked .. " completed", vim.log.levels.INFO)
       end
     end
+
+    -- Special toggle for TODO.md that updates source files
+    vim.api.nvim_create_autocmd("BufEnter", {
+      pattern = "*/TODO.md",
+      callback = function()
+        vim.keymap.set("n", "<leader>x", function()
+          local line = vim.api.nvim_get_current_line()
+          -- Extract source file and line number from comment
+          local file, line_num = line:match("<!%-%- src:(.+):(%d+) %-%->")
+          if file and line_num then
+            if toggle_todo_in_source(file, line_num) then
+              -- Refresh TODO.md after a short delay
+              vim.defer_fn(function()
+                update_vault_todos()
+                -- Reload the buffer
+                vim.cmd("edit")
+              end, 100)
+            end
+          else
+            vim.notify("Could not find source location for this TODO", vim.log.levels.WARN)
+          end
+        end, { buffer = true, desc = "Toggle TODO in source file" })
+
+        vim.keymap.set("n", ";l", function()
+          local line = vim.api.nvim_get_current_line()
+          local file, line_num = line:match("<!%-%- src:(.+):(%d+) %-%->")
+          if file and line_num then
+            if toggle_todo_in_source(file, line_num) then
+              vim.defer_fn(function()
+                update_vault_todos()
+                vim.cmd("edit")
+              end, 100)
+            end
+          else
+            vim.notify("Could not find source location for this TODO", vim.log.levels.WARN)
+          end
+        end, { buffer = true, desc = "Toggle TODO in source file" })
+      end,
+    })
 
     -- Create command to manually trigger TODO update
     vim.api.nvim_create_user_command("ObsidianUpdateTodos", update_vault_todos, {})
 
-    -- Auto-update top-level TODO.md with all TODOs in vault
+    -- Auto-update top-level TODO.md with all TODOs in vault (exclude TODO.md itself)
     vim.api.nvim_create_autocmd({ "BufWritePost" }, {
       pattern = "*/lefv-vault/*.md",
-      callback = update_vault_todos,
+      callback = function()
+        local filename = vim.fn.expand("%:t")
+        if filename ~= "TODO.md" then
+          update_vault_todos()
+        end
+      end,
     })
   end,
 }
