@@ -435,15 +435,14 @@ return {
     -- Create command to manually trigger TODO update
     vim.api.nvim_create_user_command("ObsidianUpdateTodos", update_vault_todos, {})
 
-    -- Auto-update top-level TODO.md with all TODOs in vault (exclude TODO.md itself)
-    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-      pattern = "*/lefv-vault/*.md",
-      callback = function()
-        local filename = vim.fn.expand("%:t")
-        if filename ~= "TODO.md" then
-          update_vault_todos()
-        end
-      end,
-    })
+    -- Periodic update of TODO.md every 5 minutes (instead of on every save)
+    local timer = vim.loop.new_timer()
+    timer:start(0, 300000, vim.schedule_wrap(function()
+      -- Only run if currently in vault
+      local current_file = vim.fn.expand("%:p")
+      if current_file:match("lefv%-vault") then
+        update_vault_todos()
+      end
+    end))
   end,
 }
