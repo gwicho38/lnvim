@@ -9,7 +9,12 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: add VSCode-style keyboard shortcuts\n\n- CMD+SHIFT+P opens command palette (Telescope commands)\n- CMD+C copies to system clipboard (visual mode or line)\n- CMD+X cuts to system clipboard (visual mode or line)\n- CMD+V pastes from system clipboard (all modes)\n- Works in normal, insert, visual, and command modes\nEOF\n)\")",
       "Bash(git tag:*)",
       "Bash(git commit:*)",
-      "Read(//Users/lefv/.local/share/nvim/**)"
+      "Read(//Users/lefv/.local/share/nvim/**)",
+      "Bash(git push:*)",
+      "Bash(echo \"$TMUX\")",
+      "Read(//Users/lefv/**)",
+      "Bash(tmux source:*)",
+      "Bash(brew install:*)"
     ],
     "deny": [],
     "additionalDirectories": [
