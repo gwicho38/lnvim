@@ -173,9 +173,16 @@ map({"n", "x" }, "<leader>gY", function()
   })
 end, { desc = "Git Browse (copy)" })
 
--- gitsigns
+-- git commands
 if vim.fn.executable("git") == 1 then
-  map("n", "<leader>gA", "<cmd>Git add .<cr>", { desc = "Git Add All" })
+  map("n", "<leader>ga", function()
+    local result = vim.fn.system("git add .")
+    if vim.v.shell_error == 0 then
+      vim.notify("Git: staged all changes", vim.log.levels.INFO)
+    else
+      vim.notify("Git add failed: " .. result, vim.log.levels.ERROR)
+    end
+  end, { desc = "Git Add All" })
 end
 
 -- quit

@@ -14,7 +14,13 @@
       "Bash(echo \"$TMUX\")",
       "Read(//Users/lefv/**)",
       "Bash(tmux source:*)",
-      "Bash(brew install:*)"
+      "Bash(brew install:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(tmux show-options:*)",
+      "Bash(tmux source-file:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
     "additionalDirectories": [

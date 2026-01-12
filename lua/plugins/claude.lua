@@ -4,8 +4,20 @@ return {
     "nvim-lua/plenary.nvim", -- Required for git operations
   },
   keys = {
-    { "<leader>cC", function() require("claude-code").toggle({ continue = true }) end, desc = "Claude Code (Continue)" },
-    { "<leader>cV", function() require("claude-code").toggle({ verbose = true }) end, desc = "Claude Code (Verbose)" },
+    {
+      "<leader>cC",
+      function()
+        require("claude-code").toggle({ continue = true })
+      end,
+      desc = "Claude Code (Continue)",
+    },
+    {
+      "<leader>cV",
+      function()
+        require("claude-code").toggle({ verbose = true })
+      end,
+      desc = "Claude Code (Verbose)",
+    },
   },
   config = function()
     require("claude-code").setup({
@@ -35,7 +47,7 @@ return {
         popd_cmd = "popd", -- Command to pop directory from stack (e.g., 'popd' for bash/zsh, 'exit' for nushell)
       },
       -- Command settings
-      command = "~/.claude/local/claude", -- Command used to launch Claude Code
+      command = "~/.local/bin/claude", -- Command used to launch Claude Code
       -- Command variants
       command_variants = {
         -- Conversation management

@@ -4,24 +4,33 @@ return {
     dashboard = {
       preset = {
         keys = {
-          { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
+          { icon = "󰈞 ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
           { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
-          { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
+          { icon = "󰋚 ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+          { icon = "󰊄 ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
           { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
-          { icon = " ", key = "s", desc = "Restore Session", section = "session" },
-          { icon = " ", key = "S", desc = "Load Named Session", action = ":SessionManager load_session<cr>" },
+          { icon = "󰦛 ", key = "s", desc = "Restore Session", section = "session" },
+          { icon = "󰆓 ", key = "S", desc = "Load Named Session", action = ":SessionManager load_session<cr>" },
+          { icon = " ", key = "w", desc = "Workspaces", action = function()
+            -- Load workspaces plugin and open telescope
+            require("lazy").load({ plugins = { "workspaces.nvim" } })
+            vim.cmd("Telescope workspaces")
+          end },
 
           -- Custom shortcuts
-          { icon = " ", key = "o", desc = "Obsidian Notes", action = function()
+          { icon = "󰎞 ", key = "o", desc = "Obsidian Notes", action = function()
             -- Load obsidian plugin and open vault search
             require("lazy").load({ plugins = { "obsidian.nvim" } })
             vim.cmd("ObsidianSearch")
           end },
-          { icon = " ", key = "t", desc = "Today's Note", action = function()
+          { icon = "󰃭 ", key = "t", desc = "Today's Note", action = function()
             -- Load obsidian plugin and open today's note
             require("lazy").load({ plugins = { "obsidian.nvim" } })
             vim.cmd("ObsidianToday")
+          end },
+          { icon = "󱉽 ", key = "v", desc = "Vault", action = function()
+            vim.cmd("cd ~/repos/lefv-vault")
+            Snacks.dashboard.pick("files", { cwd = vim.fn.expand("~/repos/lefv-vault") })
           end },
 
           { icon = "󰏖 ", key = "p", desc = "Browse Plugins", action = function()
@@ -116,7 +125,7 @@ return {
           end },
           
           { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
-          { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          { icon = "󰩈 ", key = "q", desc = "Quit", action = ":qa" },
         },
         header = [[
 ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
